@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { login, signup, getCustomerDetails } from '../services/authService';
+import { login, signup, adminLogin, getCustomerDetails } from '../services/authService';
 import { setToken, getToken, removeToken, setUser, getUser } from '../utils/auth';
 
 const AuthContext = createContext(null);
@@ -28,19 +28,35 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      refreshUser().finally(() => setIsLoading(false));
-    } else {
+    if (!token) {
       setIsLoading(false);
+      return;
     }
-  }, [token, refreshUser]);
+
+    if (user?.role === 'ADMIN') {
+      setIsLoading(false);
+      return;
+    }
+
+    refreshUser().finally(() => setIsLoading(false));
+  }, [token, refreshUser, user?.role]);
 
   const handleLogin = async (email, pwd) => {
     const res = await login({ email, pwd });
+    const customer = res.data.customer || { name: email, role: 'CUSTOMER' };
     setToken(res.data.token);
     setTokenState(res.data.token);
-    setUserState(res.data.customer || { name: email });
-    setUser(res.data.customer || { name: email });
+    setUserState(customer);
+    setUser(customer);
+  };
+
+  const handleAdminLogin = async (username, pwd) => {
+    const res = await adminLogin({ username, pwd });
+    const admin = res.data.admin || { name: 'Admin', role: 'ADMIN' };
+    setToken(res.data.token);
+    setTokenState(res.data.token);
+    setUserState(admin);
+    setUser(admin);
   };
 
   const handleSignup = async (data) => {
@@ -63,6 +79,7 @@ export const AuthProvider = ({ children }) => {
       token,
       isLoading,
       login: handleLogin,
+      adminLogin: handleAdminLogin,
       signup: handleSignup,
       logout: handleLogout,
       refreshUser

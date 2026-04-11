@@ -15,7 +15,7 @@ const AppNavbar = () => {
   return (
     <Navbar bg="primary" variant="dark" expand="lg" className="shadow-sm">
       <Container fluid>
-        <Navbar.Brand href="/dashboard" className="fw-bold fs-4">
+        <Navbar.Brand href={user?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'} className="fw-bold fs-4">
           <i className="bi bi-wallet2 me-2"></i>PayWallet
         </Navbar.Brand>
         <Navbar.Toggle />
