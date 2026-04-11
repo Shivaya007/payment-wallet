@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
-import { signup } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
+  const { signup } = useAuth();
+  const [form, setForm] = useState({ custName: '', email: '', pwd: '', mobileNumber: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.name || !form.email || !form.password) {
+    if (!form.custName || !form.email || !form.pwd) {
       setError('Name, email and password are required.');
       return;
     }
@@ -50,19 +51,19 @@ const Signup = () => {
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Full Name</Form.Label>
-                <Form.Control name="name" placeholder="John Doe" value={form.name} onChange={handleChange} />
+                <Form.Control name="custName" placeholder="John Doe" value={form.custName} onChange={handleChange} />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
                 <Form.Control type="email" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Phone</Form.Label>
-                <Form.Control name="phone" placeholder="+1234567890" value={form.phone} onChange={handleChange} />
+                <Form.Label>Mobile Number</Form.Label>
+                <Form.Control name="mobileNumber" placeholder="9876543210" value={form.mobileNumber} onChange={handleChange} />
               </Form.Group>
               <Form.Group className="mb-4">
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="password" name="password" placeholder="Min 6 characters" value={form.password} onChange={handleChange} />
+                <Form.Control type="password" name="pwd" placeholder="Min 6 characters" value={form.pwd} onChange={handleChange} />
               </Form.Group>
               <Button type="submit" variant="primary" className="w-100 fw-semibold" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create Account'}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Alert,Badge } from 'react-bootstrap';
 import Layout from '../components/Layout';
 import Loader from '../components/Loader';
 import { getCustomerDetails } from '../services/authService';
@@ -54,7 +54,7 @@ const Dashboard = () => {
 
       <Row className="g-4 mb-4">
         <Col md={3}>
-          <StatCard title="Wallet Balance" value={`$${wallet?.balance ?? '0.00'}`} icon="bi-wallet2" color="primary" />
+          <StatCard title="Wallet Balance" value={`₹${wallet?.balance ?? '0.00'}`} icon="bi-wallet2" color="primary" />
         </Col>
         <Col md={3}>
           <StatCard title="Total Transactions" value={transactions.length} icon="bi-arrow-left-right" color="success" />
@@ -75,7 +75,12 @@ const Dashboard = () => {
               {customer ? (
                 <table className="table table-borderless mb-0">
                   <tbody>
-                    {[['Name', customer.name], ['Email', customer.email], ['Phone', customer.phone], ['Joined', customer.createdAt?.slice(0, 10)]].map(([k, v]) => (
+                    {[
+                      ['Name', customer.custName || customer.name || customer.customerName],
+                      ['Email', customer.email || customer.username || customer.userEmail],
+                      ['Phone', customer.mobileNumber || customer.phone || customer.mobile],
+                      ['Joined', customer.createdAt?.slice(0, 10) || customer.joinedAt?.slice(0, 10) || '—'],
+                    ].map(([k, v]) => (
                       <tr key={k}>
                         <td className="text-muted fw-semibold" style={{ width: '40%' }}>{k}</td>
                         <td>{v || '—'}</td>
@@ -88,36 +93,60 @@ const Dashboard = () => {
           </Card>
         </Col>
         <Col md={7}>
-          <Card className="border-0 shadow-sm rounded-4 h-100">
-            <Card.Header className="bg-white border-0 fw-bold pt-3">Recent Transactions</Card.Header>
-            <Card.Body className="p-0">
-              {transactions.length === 0 ? (
-                <p className="text-muted p-3">No transactions yet.</p>
-              ) : (
-                <table className="table table-hover mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Type</th><th>Amount</th><th>Category</th><th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((tx, i) => (
-                      <tr key={i}>
-                        <td>
-                          <span className={`badge bg-${tx.type === 'CREDIT' ? 'success' : 'danger'}`}>
-                            {tx.type}
-                          </span>
-                        </td>
-                        <td>${tx.amount}</td>
-                        <td>{tx.category || '—'}</td>
-                        <td>{tx.date?.slice(0, 10) || '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </Card.Body>
-          </Card>
+<Card className="border-0 shadow-sm rounded-4 h-100">
+  <Card.Header className="bg-white border-0 fw-bold pt-3">
+    Recent Transactions
+  </Card.Header>
+
+  <Card.Body className="p-0">
+    {transactions.length === 0 ? (
+      <p className="text-muted p-3">No transactions yet.</p>
+    ) : (
+      <table className="table table-hover mb-0">
+        <thead className="table-light">
+          <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((tx, i) => (
+            <tr key={tx.transactionId || i}>
+              <td>
+                <Badge
+                  bg={tx.transactionType === 'CREDIT' ? 'success' : 'danger'}
+                >
+                  {tx.transactionType}
+                </Badge>
+              </td>
+
+              <td
+                className={
+                  tx.transactionType === 'CREDIT'
+                    ? 'text-success fw-semibold'
+                    : 'text-danger fw-semibold'
+                }
+              >
+                {tx.transactionType === 'CREDIT' ? '+' : '-'}₹
+                {tx.transactionAmount}
+              </td>
+
+              <td>{tx.category || '—'}</td>
+
+              <td>
+                {tx.transactionDate
+                  ? tx.transactionDate.slice(0, 10)
+                  : '—'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </Card.Body>
+</Card>
         </Col>
       </Row>
     </Layout>

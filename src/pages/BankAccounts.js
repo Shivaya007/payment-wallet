@@ -11,7 +11,7 @@ const BankAccounts = () => {
   const [success, setSuccess] = useState('');
   const [addModal, setAddModal] = useState(false);
   const [transferModal, setTransferModal] = useState({ show: false, accountId: null });
-  const [form, setForm] = useState({ accountNumber: '', bankName: '', ifscCode: '', accountHolder: '' });
+  const [form, setForm] = useState({ accountNo: '', bankname: '', ifscCode: '' });
   const [transferAmount, setTransferAmount] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,13 +26,13 @@ const BankAccounts = () => {
   useEffect(() => { fetchAccounts(); }, []);
 
   const handleAdd = async () => {
-    if (!form.accountNumber || !form.bankName) { setError('Account number and bank name are required.'); return; }
+    if (!form.accountNo || !form.bankname) { setError('Account number and bank name are required.'); return; }
     setSubmitting(true);
     try {
       await addBankAccount(form);
       setSuccess('Bank account added.');
       setAddModal(false);
-      setForm({ accountNumber: '', bankName: '', ifscCode: '', accountHolder: '' });
+      setForm({ accountNo: '  ', bankname: '', ifscCode: '' });
       fetchAccounts();
     } catch (err) { setError(err.response?.data?.message || 'Failed to add account.'); }
     finally { setSubmitting(false); }
@@ -45,7 +45,7 @@ const BankAccounts = () => {
     }
     setSubmitting(true);
     try {
-      await transferToWallet(transferModal.accountId, { amount: Number(transferAmount) });
+      await transferToWallet(transferModal.accountId, Number(transferAmount));
       setSuccess('Transfer to wallet successful.');
       setTransferModal({ show: false, accountId: null });
       setTransferAmount('');
@@ -70,20 +70,20 @@ const BankAccounts = () => {
         <Card.Body className="p-0">
           <Table hover responsive className="mb-0">
             <thead className="table-light">
-              <tr><th>#</th><th>Account Holder</th><th>Account No.</th><th>Bank</th><th>IFSC</th><th>Actions</th></tr>
+              <tr><th>#</th><th>Account No.</th><th>Bank</th><th>IFSC</th><th>Balance</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {accounts.length === 0 ? (
                 <tr><td colSpan={6} className="text-center text-muted py-4">No bank accounts found.</td></tr>
               ) : accounts.map((acc, i) => (
-                <tr key={acc.id || i}>
+                <tr key={acc.bankAccountId || i}>
                   <td>{i + 1}</td>
-                  <td>{acc.accountHolder || '—'}</td>
-                  <td>{acc.accountNumber}</td>
-                  <td>{acc.bankName}</td>
+                  <td>{acc.accountNo}</td>
+                  <td>{acc.bankname}</td>
                   <td>{acc.ifscCode || '—'}</td>
+                  <td>${acc.balance || '0.00'}</td>
                   <td>
-                    <Button size="sm" variant="outline-primary" onClick={() => setTransferModal({ show: true, accountId: acc.id })}>
+                    <Button size="sm" variant="outline-primary" onClick={() => setTransferModal({ show: true, accountId: acc.bankAccountId })}>
                       Transfer to Wallet
                     </Button>
                   </td>
@@ -98,7 +98,7 @@ const BankAccounts = () => {
       <Modal show={addModal} onHide={() => setAddModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>Add Bank Account</Modal.Title></Modal.Header>
         <Modal.Body>
-          {['accountHolder', 'accountNumber', 'bankName', 'ifscCode'].map((field) => (
+          {['accountNo', 'bankname', 'ifscCode'].map((field) => (
             <Form.Group className="mb-3" key={field}>
               <Form.Label className="text-capitalize">{field.replace(/([A-Z])/g, ' $1')}</Form.Label>
               <Form.Control value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} />

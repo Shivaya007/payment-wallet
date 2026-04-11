@@ -39,7 +39,7 @@ const Wallet = () => {
       } else {
         await debitWallet(wallet.walletId, { amount: Number(amount) });
       }
-      setSuccess(`${modal.type === 'credit' ? 'Credited' : 'Debited'} $${amount} successfully.`);
+      setSuccess(`{modal.type === 'credit' ? 'Credited' : 'Debited'} Rs.${amount} successfully.`);
       setModal({ show: false, type: '' });
       setAmount('');
       fetchWallet();
@@ -63,7 +63,7 @@ const Wallet = () => {
           <Card className="border-0 shadow rounded-4 text-white bg-primary">
             <Card.Body className="p-4">
               <div className="small opacity-75 mb-1">Wallet Balance</div>
-              <div className="display-5 fw-bold">${wallet?.balance ?? '0.00'}</div>
+              <div className="display-5 fw-bold">₹{wallet?.balance ?? '0.00'}</div>
               <hr className="border-white opacity-25" />
               <div className="small">Wallet ID: <strong>{wallet?.walletId}</strong></div>
               <div className="small">Status: <strong>{wallet?.status || 'Active'}</strong></div>
@@ -84,7 +84,7 @@ const Wallet = () => {
             <Card.Body>
               <table className="table table-borderless">
                 <tbody>
-                  {[['Wallet ID', wallet?.walletId], ['Balance', `$${wallet?.balance}`], ['Currency', wallet?.currency || 'USD'], ['Status', wallet?.status || 'Active'], ['Created', wallet?.createdAt?.slice(0, 10)]].map(([k, v]) => (
+                  {[['Wallet ID', wallet?.walletId], ['Balance', `₹${wallet?.balance}`], ['Currency', wallet?.currency || 'Rupees'], ['Status', wallet?.status || 'Active']].map(([k, v]) => (
                     <tr key={k}>
                       <td className="text-muted fw-semibold">{k}</td>
                       <td>{v || '—'}</td>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../services/authService';
-import { setToken, setUser } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: '', pwd: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,15 +16,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.email || !form.password) {
+    if (!form.email || !form.pwd) {
       setError('All fields are required.');
       return;
     }
     setLoading(true);
     try {
-      const res = await login(form);
-      setToken(res.data.token);
-      setUser(res.data.customer || { name: form.email });
+      await login(form.email, form.pwd);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -62,9 +60,9 @@ const Login = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
-                  name="password"
+                  name="pwd"
                   placeholder="Enter password"
-                  value={form.password}
+                  value={form.pwd}
                   onChange={handleChange}
                 />
               </Form.Group>
